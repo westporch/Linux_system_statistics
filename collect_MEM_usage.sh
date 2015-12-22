@@ -6,18 +6,6 @@
 
 MEM_STATISTICS=mem_statistics.csv
 
-#시스템에 R이 설치되었는지 확인함.
-function R_check()
-{
-	if [ -e "/usr/bin/Rscript" ]; then
-		echo -e "R 설치 확인:				[  \e[1;32mOK\e[0m  ]"
-	else
-		echo -e "R 설치 확인:				[  \e[1;31mFAIL\e[0m  ]"
-		echo "\e[1;31mR을 설치해야 데이터 수집, 그래프 그리기가 가능합니다.\e[0m"
-		exit
-	fi
-}
-
 function get_data()
 {
 	MemFree_kb=`cat /proc/meminfo | grep MemFree | awk '{print $2}'`
@@ -73,7 +61,6 @@ function process_check()
 	rm -rf $PID_TXT
 }
 
-R_check
 process_check
 init_document 
 
