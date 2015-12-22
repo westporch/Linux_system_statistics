@@ -1,21 +1,24 @@
 #!/bin/bash
-
 #Hyeongwan Seo
-
 #./collect_data.sh stop -> 데이터 수집을 중지함.
 
 MEM_STATISTICS=mem_statistics.csv
+MEMINFO_RESULT=meminfo.txt
 
 function get_data()
 {
-	MemFree_kb=`cat /proc/meminfo | grep MemFree | awk '{print $2}'`
+	cat /proc/meminfo > $MEMINFO_RESULT
+
+	MemFree_kb=`cat $MEMINFO_RESULT | grep MemFree | awk '{print $2}'`
 	MemFree_mb=`echo "$MemFree_kb 1024" | awk '{print $1/$2}'`
-	Cached_kb=`cat /proc/meminfo | grep ^Cached | awk '{print $2}'`
+	Cached_kb=`cat $MEMINFO_RESULT | grep ^Cached | awk '{print $2}'`
 	Cached_mb=`echo "$Cached_kb 1024" | awk '{print $1/$2}'`
-	Active_anon_kb=`cat /proc/meminfo | grep Active\(anon\) | awk '{print $2}'`
-	Active_file_kb=`cat /proc/meminfo | grep Active\(file\) | awk '{print $2}'`
+	Active_anon_kb=`cat $MEMINFO_RESULT | grep Active\(anon\) | awk '{print $2}'`
+	Active_file_kb=`cat $MEMINFO_RESULT | grep Active\(file\) | awk '{print $2}'`
 	Active_kb=`expr $Active_anon_kb + $Active_file_kb`
 	Active_mb=`echo "$Active_kb 1024" | awk '{print $1/$2}'`
+
+	rm -rf $MEMINFO_RESULT	#수집한 파일을 삭제함
 }
 
 function print_data()
@@ -24,7 +27,7 @@ function print_data()
 	do
 		get_data
 		echo "`date '+%Y-%m-%d %H:%M:%S %Z'`,$MemFree_mb,$Active_mb,$Cached_mb" >> $MEM_STATISTICS
-		sleep 1m	# 데이터 수집 주기 설정 ex) 30s -> 30초, 10m -> 10분, 1h -> 1시간
+		sleep 2s	# 데이터 수집 주기 설정 ex) 30s -> 30초, 10m -> 10분, 1h -> 1시간
 	done
 }
 
